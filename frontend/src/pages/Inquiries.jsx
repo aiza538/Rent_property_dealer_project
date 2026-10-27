@@ -9,6 +9,8 @@ export default function Inquiries() {
   const [properties, setProperties] = useState([]);
   const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   async function load() {
     try {
@@ -25,19 +27,29 @@ export default function Inquiries() {
   // Fast form: only name, contact, property and notes are required.
   async function submit(e) {
     e.preventDefault();
-    await api('/dealers/inquiries', {
-      method: 'POST',
-      body: {
-        property_id: Number(form.property_id),
-        prospective_tenant_name: form.prospective_tenant_name,
-        contact_number: form.contact_number,
-        notes: form.notes,
-        status: form.status,
-        viewing_date: form.viewing_date ? new Date(form.viewing_date).toISOString() : null,
-      },
-    });
-    setForm(EMPTY);
-    load();
+    setError('');
+    setNotice('');
+    setSubmitting(true);
+    try {
+      await api('/dealers/inquiries', {
+        method: 'POST',
+        body: {
+          property_id: Number(form.property_id),
+          prospective_tenant_name: form.prospective_tenant_name,
+          contact_number: form.contact_number,
+          notes: form.notes,
+          status: form.status,
+          viewing_date: form.viewing_date ? new Date(form.viewing_date).toISOString() : null,
+        },
+      });
+      setForm(EMPTY);
+      setNotice('Inquiry logged successfully.');
+      load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -45,6 +57,10 @@ export default function Inquiries() {
       <h1>Inquiries</h1>
       <p className="muted">Log an inquiry right after a call — only name, contact, property and notes are required.</p>
       {error && <p className="error">{error}</p>}
+      {notice && <p className="success">{notice}</p>}
+      {properties.length === 0 && (
+        <p className="muted">No properties available yet — link a landlord first from My Landlords, then their properties will appear in the dropdown.</p>
+      )}
       <form onSubmit={submit} className="form card">
         <div className="row">
           <label>Name<input value={form.prospective_tenant_name} onChange={(e) => setForm({ ...form, prospective_tenant_name: e.target.value })} required /></label>
@@ -68,7 +84,9 @@ export default function Inquiries() {
           <label>Viewing date (optional)<input type="datetime-local" value={form.viewing_date} onChange={(e) => setForm({ ...form, viewing_date: e.target.value })} /></label>
         </div>
         <label>Notes<textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} required /></label>
-        <button className="btn btn-primary" type="submit">Log inquiry</button>
+        <button className="btn btn-primary" type="submit" disabled={submitting}>
+          {submitting ? 'Logging...' : 'Log inquiry'}
+        </button>
       </form>
       <table className="table">
         <thead><tr><th>Name</th><th>Contact</th><th>Property</th><th>Status</th><th>Viewing</th><th>Notes</th></tr></thead>
