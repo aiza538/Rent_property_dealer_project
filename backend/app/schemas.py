@@ -268,6 +268,27 @@ class CommissionOut(BaseModel):
     dealer_name: str | None = None
 
 
+class AgreementCreate(BaseModel):
+    title: str
+    content: str
+    property_id: int | None = None
+
+
+class AgreementOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    dealer_id: int
+    property_id: int | None
+    landlord_id: int | None
+    title: str
+    content: str
+    created_at: datetime
+    updated_at: datetime
+    property_title: str | None = None
+    dealer_name: str | None = None
+    dealer_business_name: str | None = None
+
+
 class DealerSummaryOut(BaseModel):
     total_linked_landlords: int
     total_properties: int

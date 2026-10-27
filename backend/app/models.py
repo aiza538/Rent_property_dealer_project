@@ -231,3 +231,26 @@ class Commission(Base):
     dealer = relationship("User", foreign_keys=[dealer_id])
     property = relationship("Property")
     landlord = relationship("User", foreign_keys=[landlord_id])
+
+
+class Agreement(Base):
+    """A rental agreement drafted by a dealer.
+
+    The dealer writes free-form content; the PDF layout (dealer title,
+    agreement title, date, property) is applied when it is downloaded.
+    """
+
+    __tablename__ = "agreements"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    dealer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    property_id: Mapped[int | None] = mapped_column(ForeignKey("properties.id"), nullable=True)
+    landlord_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now, nullable=False)
+
+    dealer = relationship("User", foreign_keys=[dealer_id])
+    property = relationship("Property")
+    landlord = relationship("User", foreign_keys=[landlord_id])

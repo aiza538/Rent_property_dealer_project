@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, homeForRole, useAuth } from './AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './ProtectedRoute';
+import Agreements from './pages/Agreements';
 import Commissions from './pages/Commissions';
 import DealerDashboard from './pages/DealerDashboard';
 import DealerProperties from './pages/DealerProperties';
@@ -50,6 +51,10 @@ export default function App() {
           <Route
             path="/dealer/inquiries"
             element={<ProtectedRoute roles={['dealer']}><Inquiries /></ProtectedRoute>}
+          />
+          <Route
+            path="/dealer/agreements"
+            element={<ProtectedRoute roles={['dealer']}><Agreements /></ProtectedRoute>}
           />
           <Route
             path="/dealer/commissions"

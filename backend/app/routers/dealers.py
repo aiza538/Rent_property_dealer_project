@@ -2,8 +2,10 @@
 LandlordDealerLink via app.deps — see that module for the rule."""
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from ..agreement_pdf import render_agreement_pdf
 from ..auth import require_role
 from ..database import get_db
 from ..deps import (
@@ -27,6 +29,7 @@ from ..models import (
     LINK_ACTIVE,
     ROLE_DEALER,
     ROLE_LANDLORD,
+    Agreement,
     Commission,
     DealerProfile,
     Inquiry,
@@ -36,6 +39,8 @@ from ..models import (
     User,
 )
 from ..schemas import (
+    AgreementCreate,
+    AgreementOut,
     CommissionCreate,
     CommissionOut,
     DealerProfileCreate,
@@ -415,3 +420,100 @@ def dashboard_summary(user: User = Depends(dealer_only), db: Session = Depends(g
         "recent_inquiries": [_serialize_inquiry(db, r) for r in recent_inquiries],
         "recent_listings": [_serialize_listing(db, r) for r in recent_listings],
     }
+
+
+# ---------------------------------------------------------------- agreements
+def _serialize_agreement(db: Session, row: Agreement) -> AgreementOut:
+    item = AgreementOut.model_validate(row)
+    item.property_title = row.property.title if row.property else None
+    item.dealer_name = row.dealer.name if row.dealer else None
+    profile = (
+        db.query(DealerProfile).filter(DealerProfile.user_id == row.dealer_id).first()
+    )
+    item.dealer_business_name = (
+        profile.business_name if profile and profile.business_name else None
+    )
+    return item
+
+
+def _get_own_agreement(db: Session, dealer_id: int, agreement_id: int) -> Agreement:
+    row = (
+        db.query(Agreement)
+        .filter(Agreement.id == agreement_id, Agreement.dealer_id == dealer_id)
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail="Agreement not found")
+    return row
+
+
+@router.post("/agreements", response_model=AgreementOut, status_code=201)
+def create_agreement(
+    payload: AgreementCreate, user: User = Depends(dealer_only), db: Session = Depends(get_db)
+):
+    landlord_id = None
+    if payload.property_id is not None:
+        prop = require_dealer_link_to_property(db, user.id, payload.property_id)
+        landlord_id = prop.landlord_id
+    row = Agreement(
+        dealer_id=user.id,
+        property_id=payload.property_id,
+        landlord_id=landlord_id,
+        title=payload.title,
+        content=payload.content,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return _serialize_agreement(db, row)
+
+
+@router.get("/agreements", response_model=list[AgreementOut])
+def list_agreements(user: User = Depends(dealer_only), db: Session = Depends(get_db)):
+    rows = (
+        db.query(Agreement)
+        .filter(Agreement.dealer_id == user.id)
+        .order_by(Agreement.id.desc())
+        .all()
+    )
+    return [_serialize_agreement(db, r) for r in rows]
+
+
+@router.get("/agreements/{agreement_id}", response_model=AgreementOut)
+def get_agreement(
+    agreement_id: int, user: User = Depends(dealer_only), db: Session = Depends(get_db)
+):
+    return _serialize_agreement(db, _get_own_agreement(db, user.id, agreement_id))
+
+
+@router.delete("/agreements/{agreement_id}", status_code=204)
+def delete_agreement(
+    agreement_id: int, user: User = Depends(dealer_only), db: Session = Depends(get_db)
+):
+    row = _get_own_agreement(db, user.id, agreement_id)
+    db.delete(row)
+    db.commit()
+    return None
+
+
+@router.get("/agreements/{agreement_id}/pdf")
+def download_agreement_pdf(
+    agreement_id: int, user: User = Depends(dealer_only), db: Session = Depends(get_db)
+):
+    row = _get_own_agreement(db, user.id, agreement_id)
+    item = _serialize_agreement(db, row)
+    dealer_title = item.dealer_business_name or item.dealer_name or user.name
+    pdf_bytes = render_agreement_pdf(
+        dealer_title=dealer_title,
+        agreement_title=row.title,
+        content=row.content,
+        property_title=item.property_title,
+        landlord_name=row.landlord.name if row.landlord else None,
+        created_at=row.created_at,
+    )
+    filename = f"rental-agreement-{row.id}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

@@ -28,6 +28,7 @@ export default function Layout({ children }) {
               <Link to="/dealer/landlords">My Landlords</Link>
               <Link to="/dealer/properties">Properties</Link>
               <Link to="/dealer/inquiries">Inquiries</Link>
+              <Link to="/dealer/agreements">Agreements</Link>
               <Link to="/dealer/commissions">Commissions</Link>
             </>
           )}
