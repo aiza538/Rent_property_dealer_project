@@ -62,6 +62,7 @@ h3 { font-size: 16px; margin: 0 0 8px; }
 .big { font-size: 26px; font-weight: 700; margin: 4px 0 0; }
 .muted { color: var(--muted); }
 .error { color: var(--danger); background: #fdeceb; padding: 10px 12px; border-radius: 8px; }
+.success { color: #1a6b3c; background: #e6f4ea; padding: 10px 12px; border-radius: 8px; }
 
 .form { display: flex; flex-direction: column; gap: 12px; }
 .form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; flex: 1; }
