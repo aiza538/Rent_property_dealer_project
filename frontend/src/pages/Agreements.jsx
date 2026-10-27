@@ -22,6 +22,8 @@ async function downloadPdf(id, title) {
 export default function Agreements() {
   const [agreements, setAgreements] = useState([]);
   const [properties, setProperties] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [businessName, setBusinessName] = useState('');
   const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -29,15 +31,36 @@ export default function Agreements() {
 
   async function load() {
     try {
-      const [a, p] = await Promise.all([api('/dealers/agreements'), api('/dealers/properties')]);
+      const [a, p, prof] = await Promise.all([
+        api('/dealers/agreements'),
+        api('/dealers/properties'),
+        api('/dealers/profile'),
+      ]);
       setAgreements(a);
       setProperties(p);
+      setProfile(prof);
+      if (prof) setBusinessName(prof.business_name || '');
     } catch (err) {
       setError(err.message);
     }
   }
 
   useEffect(() => { load(); }, []);
+
+  async function saveProfile(e) {
+    e.preventDefault();
+    setError('');
+    setNotice('');
+    try {
+      const saved = profile
+        ? await api('/dealers/profile', { method: 'PUT', body: { business_name: businessName } })
+        : await api('/dealers/profile', { method: 'POST', body: { business_name: businessName } });
+      setProfile(saved);
+      setNotice('Dealer title saved. It will appear on every agreement PDF.');
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -92,6 +115,12 @@ export default function Agreements() {
       </p>
       {error && <p className="error">{error}</p>}
       {notice && <p className="success">{notice}</p>}
+      <form onSubmit={saveProfile} className="form card">
+        <h3>Dealer title on PDFs</h3>
+        <p className="muted">This name appears at the top of every agreement PDF as the property dealer title. If left empty, your own name is used.</p>
+        <label>Business name<input value={businessName} onChange={(e) => setBusinessName(e.target.value)} required placeholder="e.g. Demo Estate Advisors" /></label>
+        <button className="btn btn-primary" type="submit">Save title</button>
+      </form>
       <form onSubmit={submit} className="form card">
         <label>Agreement title<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required placeholder="e.g. Rent Agreement - Gulberg Flat" /></label>
         <label>Property (optional)
