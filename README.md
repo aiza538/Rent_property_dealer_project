@@ -85,3 +85,34 @@ frontend/
     pages/             Login, Register, Landlord/Tenant/Dealer dashboards,
                        MyLandlords, DealerProperties, Inquiries, Commissions
 ```
+
+## Deployment (all free tiers)
+
+### Database — Supabase (free Postgres)
+Create a project at supabase.com. No manual SQL is needed: the backend
+creates all 10 tables automatically on first boot
+(`Base.metadata.create_all` in `backend/app/main.py`). Copy the Postgres
+connection string from Project Settings → Database (URI format) and use it
+as `DATABASE_URL` below. If the connection fails, append `?sslmode=require`.
+
+### Backend — Render (free tier)
+In Render: New → Blueprint → select this repo (`render.yaml` is picked up
+automatically). Then set in the Render dashboard:
+- `DATABASE_URL` — Supabase connection string (see above)
+- `CORS_ORIGINS` — the Netlify frontend URL (set this after the frontend
+  is live, then redeploy the backend)
+- `SECRET_KEY` — generated automatically by Render
+
+Note: Render's free service sleeps when idle, so the first request after a
+while can take ~a minute. Do NOT use SQLite in production on Render — its
+filesystem is ephemeral and the database file would be lost on restart.
+
+### Frontend — Netlify (free tier)
+In Netlify: Add new site → Import from GitHub → select this repo
+(`netlify.toml` is picked up automatically). Then set in Site settings →
+Environment variables:
+- `VITE_API_URL` — the deployed Render backend URL
+  (e.g. `https://rentaasan-backend.onrender.com`)
+
+Trigger a redeploy after setting it, because Vite embeds the API URL at
+build time.

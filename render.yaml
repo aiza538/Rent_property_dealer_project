@@ -1,0 +1,26 @@
+# Render Blueprint for the RentAasan FastAPI backend.
+# In Render: New → Blueprint → select this repo, and it will pick this up.
+# Then set these two values in the Render dashboard (do NOT commit secrets):
+#   DATABASE_URL = Supabase Postgres connection string (URI format), e.g.
+#     postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres
+#     If the connection fails, append ?sslmode=require to the URI.
+#   CORS_ORIGINS = the Netlify frontend URL, e.g. https://your-site.netlify.app
+# SECRET_KEY is generated automatically by Render below.
+services:
+  - type: web
+    name: rentaasan-backend
+    env: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: http://localhost:5173
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 10080

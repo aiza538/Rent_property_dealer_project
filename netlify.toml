@@ -1,0 +1,15 @@
+# Netlify configuration for the RentAasan React frontend.
+# Connect this repo in Netlify and it will pick these settings up automatically.
+# IMPORTANT: set VITE_API_URL in the Netlify dashboard (Site settings →
+# Environment variables) to the deployed Render backend URL, e.g.
+# https://rentaasan-backend.onrender.com — then trigger a redeploy, because
+# Vite embeds the API URL at build time.
+[build]
+  base = "frontend"
+  command = "npm install && npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
