@@ -31,7 +31,8 @@ export default function Register() {
         <label>Name<input value={form.name} onChange={(e) => set('name', e.target.value)} required /></label>
         <label>Email<input value={form.email} onChange={(e) => set('email', e.target.value)} required /></label>
         <label>Phone<input value={form.phone} onChange={(e) => set('phone', e.target.value)} /></label>
-        <label>Password<input type="password" value={form.password} onChange={(e) => set('password', e.target.value)} required /></label>
+        <label>Password<input type="password" value={form.password} onChange={(e) => set('password', e.target.value)} required minLength={6} /></label>
+        <small className="muted">At least 6 characters</small>
         <label>Role
           <select value={form.role} onChange={(e) => set('role', e.target.value)}>
             <option value="landlord">Landlord</option>
