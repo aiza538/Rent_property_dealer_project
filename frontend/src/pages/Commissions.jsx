@@ -3,9 +3,11 @@ import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import { useAuth } from '../AuthContext';
 import { formatPKR } from '../constants';
+import { useLanguage } from '../i18n';
 
 export default function Commissions() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [rows, setRows] = useState([]);
   const [properties, setProperties] = useState([]);
   const [error, setError] = useState('');
@@ -45,27 +47,27 @@ export default function Commissions() {
 
   return (
     <div>
-      <h1>Commissions</h1>
+      <h1>{t('commissions')}</h1>
       {error && <p className="error">{error}</p>}
       {user.role === 'dealer' && (
         <form onSubmit={requestPayment} className="form card">
-          <h3>Request payment for a closed deal</h3>
+          <h3>{t('requestPaymentTitle')}</h3>
           <div className="row">
-            <label>Property
+            <label>{t('property')}
               <select value={form.property_id} onChange={(e) => setForm({ ...form, property_id: e.target.value })} required>
-                <option value="">Select…</option>
+                <option value="">{t('select')}</option>
                 {properties.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
               </select>
             </label>
-            <label>Amount<input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required /></label>
-            <label>Deal closed date<input type="date" value={form.deal_closed_date} onChange={(e) => setForm({ ...form, deal_closed_date: e.target.value })} /></label>
+            <label>{t('amount')}<input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required /></label>
+            <label>{t('dealClosedDate')}<input type="date" value={form.deal_closed_date} onChange={(e) => setForm({ ...form, deal_closed_date: e.target.value })} /></label>
           </div>
-          <label>Notes<textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></label>
-          <button className="btn btn-primary" type="submit">Request payment</button>
+          <label>{t('notes')}<textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></label>
+          <button className="btn btn-primary" type="submit">{t('requestPayment')}</button>
         </form>
       )}
       <table className="table">
-        <thead><tr><th>Property</th><th>Amount</th><th>Status</th><th>Closed</th><th>Action</th></tr></thead>
+        <thead><tr><th>{t('property')}</th><th>{t('amount')}</th><th>{t('status')}</th><th>{t('closedCol')}</th><th>{t('action')}</th></tr></thead>
         <tbody>
           {rows.map((c) => (
             <tr key={c.id}>
@@ -81,10 +83,10 @@ export default function Commissions() {
                       load();
                     }}
                   >
-                    Mark as paid
+                    {t('markAsPaid')}
                   </button>
                 )}
-                {user.role === 'dealer' && c.status === 'pending' && <span className="muted">Awaiting landlord</span>}
+                {user.role === 'dealer' && c.status === 'pending' && <span className="muted">{t('awaitingLandlord')}</span>}
               </td>
             </tr>
           ))}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
+import { useLanguage } from '../i18n';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const EMPTY = { property_id: '', title: '', content: '' };
@@ -20,6 +21,7 @@ async function downloadPdf(id, title) {
 }
 
 export default function Agreements() {
+  const { t } = useLanguage();
   const [agreements, setAgreements] = useState([]);
   const [properties, setProperties] = useState([]);
   const [profile, setProfile] = useState(null);
@@ -56,7 +58,7 @@ export default function Agreements() {
         ? await api('/dealers/profile', { method: 'PUT', body: { business_name: businessName } })
         : await api('/dealers/profile', { method: 'POST', body: { business_name: businessName } });
       setProfile(saved);
-      setNotice('Dealer title saved. It will appear on every agreement PDF.');
+      setNotice(t('titleSaved'));
     } catch (err) {
       setError(err.message);
     }
@@ -77,7 +79,7 @@ export default function Agreements() {
         },
       });
       setForm(EMPTY);
-      setNotice('Agreement saved. Download its PDF from the list below.');
+      setNotice(t('agreementSaved'));
       load();
     } catch (err) {
       setError(err.message);
@@ -108,36 +110,33 @@ export default function Agreements() {
 
   return (
     <div>
-      <h1>Rental Agreements</h1>
-      <p className="muted">
-        Write the agreement in your own words. The PDF is laid out as an organized
-        document under your business name (from your dealer profile, else your name).
-      </p>
+      <h1>{t('agreementsTitle')}</h1>
+      <p className="muted">{t('agreementsHint')}</p>
       {error && <p className="error">{error}</p>}
       {notice && <p className="success">{notice}</p>}
       <form onSubmit={saveProfile} className="form card">
-        <h3>Dealer title on PDFs</h3>
-        <p className="muted">This name appears at the top of every agreement PDF as the property dealer title. If left empty, your own name is used.</p>
-        <label>Business name<input value={businessName} onChange={(e) => setBusinessName(e.target.value)} required placeholder="e.g. Demo Estate Advisors" /></label>
-        <button className="btn btn-primary" type="submit">Save title</button>
+        <h3>{t('dealerTitleOnPdf')}</h3>
+        <p className="muted">{t('dealerTitleHint')}</p>
+        <label>{t('businessName')}<input value={businessName} onChange={(e) => setBusinessName(e.target.value)} required placeholder={t('businessNamePh')} /></label>
+        <button className="btn btn-primary" type="submit">{t('saveTitle')}</button>
       </form>
       <form onSubmit={submit} className="form card">
-        <label>Agreement title<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required placeholder="e.g. Rent Agreement - Gulberg Flat" /></label>
-        <label>Property (optional)
+        <label>{t('agreementTitle')}<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required placeholder={t('agreementTitlePh')} /></label>
+        <label>{t('propertyOptional')}
           <select value={form.property_id} onChange={(e) => setForm({ ...form, property_id: e.target.value })}>
-            <option value="">No specific property</option>
+            <option value="">{t('noProperty')}</option>
             {properties.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
           </select>
         </label>
-        <label>Agreement content<textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required rows={12} placeholder="Write whatever you want in the agreement, one clause per paragraph..." /></label>
+        <label>{t('agreementContent')}<textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required rows={12} placeholder={t('agreementContentPh')} /></label>
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? 'Saving...' : 'Save agreement'}
+          {submitting ? t('saving') : t('saveAgreement')}
         </button>
       </form>
-      <h2>Saved agreements</h2>
-      {agreements.length === 0 && <p className="muted">No agreements yet.</p>}
+      <h2>{t('savedAgreements')}</h2>
+      {agreements.length === 0 && <p className="muted">{t('noAgreements')}</p>}
       <table className="table">
-        <thead><tr><th>Title</th><th>Property</th><th>Created</th><th></th></tr></thead>
+        <thead><tr><th>{t('title')}</th><th>{t('property')}</th><th>{t('created')}</th><th></th></tr></thead>
         <tbody>
           {agreements.map((a) => (
             <tr key={a.id}>
@@ -145,8 +144,8 @@ export default function Agreements() {
               <td>{a.property_title || '—'}</td>
               <td>{new Date(a.created_at).toLocaleDateString()}</td>
               <td>
-                <button className="btn btn-small" onClick={() => onDownload(a.id)}>Download PDF</button>{' '}
-                <button className="btn btn-small btn-danger" onClick={() => onDelete(a.id)}>Delete</button>
+                <button className="btn btn-small" onClick={() => onDownload(a.id)}>{t('downloadPdf')}</button>{' '}
+                <button className="btn btn-small btn-danger" onClick={() => onDelete(a.id)}>{t('delete')}</button>
               </td>
             </tr>
           ))}

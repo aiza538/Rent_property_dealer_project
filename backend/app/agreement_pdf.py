@@ -9,7 +9,7 @@ so anything outside latin-1 is replaced instead of breaking the download.
 
 from datetime import datetime
 
-from fpdf import FPDF
+from fpdf import FPDF, XPos, YPos
 
 _REPLACEMENTS = {
     "\u2018": "'",
@@ -67,13 +67,17 @@ def render_agreement_pdf(
     pdf.add_page()
 
     # Title block: dealer title first, then the document type.
+    # NOTE: fpdf2 multi_cell defaults new_x to RIGHT, which would leave the
+    # cursor at the right margin and push the next line off the page. Every
+    # multi_cell here pins new_x to LMARGIN so each block starts at the
+    # left margin, and multi_cell (unlike cell) wraps long lines.
     pdf.set_font("Helvetica", "B", 20)
     pdf.set_text_color(26, 36, 51)
-    pdf.multi_cell(0, 10, _clean(dealer_title))
+    pdf.multi_cell(0, 10, _clean(dealer_title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_font("Helvetica", "", 13)
     pdf.set_text_color(31, 111, 91)
-    pdf.cell(0, 8, "Rental Agreement")
-    pdf.ln(10)
+    pdf.multi_cell(0, 8, "Rental Agreement", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.ln(2)
     pdf.set_draw_color(226, 230, 236)
     pdf.line(20, pdf.get_y(), 190, pdf.get_y())
     pdf.ln(6)
@@ -81,7 +85,7 @@ def render_agreement_pdf(
     # Meta lines.
     pdf.set_font("Helvetica", "B", 13)
     pdf.set_text_color(26, 36, 51)
-    pdf.multi_cell(0, 8, _clean(agreement_title))
+    pdf.multi_cell(0, 8, _clean(agreement_title), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_font("Helvetica", "", 11)
     pdf.set_text_color(107, 118, 134)
     if isinstance(created_at, datetime):
@@ -89,14 +93,11 @@ def render_agreement_pdf(
     else:
         date_str = str(created_at) if created_at else ""
     if date_str:
-        pdf.cell(0, 7, f"Date: {date_str}")
-        pdf.ln(7)
+        pdf.multi_cell(0, 7, f"Date: {date_str}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     if property_title:
-        pdf.cell(0, 7, f"Property: {_clean(property_title)}")
-        pdf.ln(7)
+        pdf.multi_cell(0, 7, f"Property: {_clean(property_title)}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     if landlord_name:
-        pdf.cell(0, 7, f"Landlord: {_clean(landlord_name)}")
-        pdf.ln(7)
+        pdf.multi_cell(0, 7, f"Landlord: {_clean(landlord_name)}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.ln(4)
 
     # Content, one paragraph per line; blank lines become spacing.
@@ -107,7 +108,7 @@ def render_agreement_pdf(
         if not line:
             pdf.ln(4)
             continue
-        pdf.multi_cell(0, 6.5, line)
+        pdf.multi_cell(0, 6.5, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         pdf.ln(1.5)
 
     return bytes(pdf.output())

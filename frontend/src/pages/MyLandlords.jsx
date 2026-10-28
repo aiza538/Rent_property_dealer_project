@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
+import { useLanguage } from '../i18n';
 
 export default function MyLandlords() {
+  const { t } = useLanguage();
   const [links, setLinks] = useState([]);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
@@ -35,36 +37,36 @@ export default function MyLandlords() {
 
   return (
     <div>
-      <h1>My Landlords</h1>
+      <h1>{t('myLandlords')}</h1>
       {error && <p className="error">{error}</p>}
       <form onSubmit={invite} className="form card">
-        <h3>Invite a landlord</h3>
-        <p className="muted">The landlord must already have a RentAasan landlord account. They approve the request before you get access.</p>
+        <h3>{t('inviteLandlord')}</h3>
+        <p className="muted">{t('inviteLandlordHint')}</p>
         <div className="row">
-          <label>Landlord email<input value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+          <label>{t('landlordEmail')}<input value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
         </div>
-        <button className="btn btn-primary" type="submit">Send invite</button>
+        <button className="btn btn-primary" type="submit">{t('sendInvite')}</button>
       </form>
       <table className="table">
-        <thead><tr><th>Landlord</th><th>Property</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>{t('landlord')}</th><th>{t('property')}</th><th>{t('status')}</th><th>{t('actions')}</th></tr></thead>
         <tbody>
           {links.map((l) => (
             <tr key={l.id}>
               <td>{l.landlord_name}</td>
-              <td>{l.property_title || 'All properties'}</td>
+              <td>{l.property_title || t('allProperties')}</td>
               <td><StatusBadge status={l.status} /></td>
               <td>
                 {l.status === 'pending' && l.initiated_by === 'landlord' && (
                   <>
-                    <button className="btn btn-small" onClick={() => action(l.id, 'accept')}>Accept</button>{' '}
-                    <button className="btn btn-small btn-ghost" onClick={() => action(l.id, 'reject')}>Reject</button>
+                    <button className="btn btn-small" onClick={() => action(l.id, 'accept')}>{t('accept')}</button>{' '}
+                    <button className="btn btn-small btn-ghost" onClick={() => action(l.id, 'reject')}>{t('reject')}</button>
                   </>
                 )}
                 {l.status === 'pending' && l.initiated_by === 'dealer' && (
-                  <span className="muted">Awaiting landlord</span>
+                  <span className="muted">{t('awaitingLandlord')}</span>
                 )}
                 {l.status === 'active' && (
-                  <button className="btn btn-small btn-danger" onClick={() => action(l.id, 'revoke')}>Revoke</button>
+                  <button className="btn btn-small btn-danger" onClick={() => action(l.id, 'revoke')}>{t('revoke')}</button>
                 )}
               </td>
             </tr>

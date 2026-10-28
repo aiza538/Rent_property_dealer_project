@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, homeForRole, useAuth } from './AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './ProtectedRoute';
+import { LanguageProvider, useLanguage } from './i18n';
 import Agreements from './pages/Agreements';
 import Commissions from './pages/Commissions';
 import DealerDashboard from './pages/DealerDashboard';
@@ -15,15 +16,17 @@ import TenantDashboard from './pages/TenantDashboard';
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
-  if (loading) return <p className="muted">Loading…</p>;
+  const { t } = useLanguage();
+  if (loading) return <p className="muted">{t('loading')}</p>;
   if (!user) return <Navigate to="/login" replace />;
   return <Navigate to={homeForRole(user.role)} replace />;
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Layout>
+    <LanguageProvider>
+      <AuthProvider>
+        <Layout>
         <Routes>
           <Route path="/" element={<HomeRedirect />} />
           <Route path="/login" element={<Login />} />
@@ -67,6 +70,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
-    </AuthProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

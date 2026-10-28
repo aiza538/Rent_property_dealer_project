@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import { formatPKR } from '../constants';
+import { useLanguage } from '../i18n';
 
 export default function TenantDashboard() {
+  const { t } = useLanguage();
   const [tenancy, setTenancy] = useState(null);
   const [payments, setPayments] = useState([]);
   const [complaints, setComplaints] = useState([]);
@@ -41,7 +43,7 @@ export default function TenantDashboard() {
         body: { property_id: tenancy.property_id, title: form.title, description: form.description },
       });
       setForm({ title: '', description: '' });
-      setNotice('Complaint submitted successfully.');
+      setNotice(t('complaintSuccess'));
       load();
     } catch (err) {
       setError(err.message);
@@ -52,20 +54,20 @@ export default function TenantDashboard() {
 
   return (
     <div>
-      <h1>Tenant Dashboard</h1>
+      <h1>{t('tenantDashboard')}</h1>
       {error && <p className="error">{error}</p>}
       {tenancy ? (
         <div className="card">
           <h3>{tenancy.property_title}</h3>
-          <p>Monthly rent: {formatPKR(tenancy.monthly_rent)} · Due day: {tenancy.due_day} · Status: <StatusBadge status={tenancy.status} /></p>
+          <p>{t('monthlyRentIs')} {formatPKR(tenancy.monthly_rent)} · {t('dueDayIs')} {tenancy.due_day} · {t('statusIs')} <StatusBadge status={tenancy.status} /></p>
         </div>
       ) : (
-        <p className="muted">No active tenancy yet.</p>
+        <p className="muted">{t('noTenancy')}</p>
       )}
 
-      <h2>Rent payments</h2>
+      <h2>{t('rentPayments')}</h2>
       <table className="table">
-        <thead><tr><th>Amount</th><th>Due date</th><th>Paid date</th><th>Status</th></tr></thead>
+        <thead><tr><th>{t('amount')}</th><th>{t('dueDate')}</th><th>{t('paidDate')}</th><th>{t('status')}</th></tr></thead>
         <tbody>
           {payments.map((p) => (
             <tr key={p.id}>
@@ -76,20 +78,20 @@ export default function TenantDashboard() {
         </tbody>
       </table>
 
-      <h2>Report a complaint</h2>
+      <h2>{t('reportComplaint')}</h2>
       {notice && <p className="success">{notice}</p>}
       {!tenancy && (
-        <p className="muted">You can submit a complaint once a landlord links you to a property (active tenancy).</p>
+        <p className="muted">{t('complaintHint')}</p>
       )}
       <form onSubmit={submitComplaint} className="form card">
-        <label>Title<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
-        <label>Description<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
+        <label>{t('title')}<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
+        <label>{t('description')}<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
         <button className="btn btn-primary" type="submit" disabled={!tenancy || submitting}>
-          {submitting ? 'Submitting...' : 'Submit complaint'}
+          {submitting ? t('submitting') : t('submitComplaint')}
         </button>
       </form>
       <table className="table">
-        <thead><tr><th>Title</th><th>Status</th><th>Updated</th></tr></thead>
+        <thead><tr><th>{t('title')}</th><th>{t('status')}</th><th>{t('updated')}</th></tr></thead>
         <tbody>
           {complaints.map((c) => (
             <tr key={c.id}>

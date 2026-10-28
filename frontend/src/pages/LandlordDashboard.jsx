@@ -2,11 +2,21 @@ import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import { formatPKR } from '../constants';
+import { useLanguage } from '../i18n';
 
-const TABS = ['Overview', 'Properties', 'Tenants', 'Complaints', 'Dealers', 'Commissions'];
+const TABS = ['overview', 'properties', 'tenants', 'complaints', 'dealers', 'commissions'];
+const TAB_LABELS = {
+  overview: 'overview',
+  properties: 'properties',
+  tenants: 'tenants',
+  complaints: 'complaints',
+  dealers: 'dealers',
+  commissions: 'commissions',
+};
 
 export default function LandlordDashboard() {
-  const [tab, setTab] = useState('Overview');
+  const { t } = useLanguage();
+  const [tab, setTab] = useState('overview');
   const [summary, setSummary] = useState(null);
   const [properties, setProperties] = useState([]);
   const [tenancies, setTenancies] = useState([]);
@@ -90,55 +100,55 @@ export default function LandlordDashboard() {
 
   return (
     <div>
-      <h1>Landlord Dashboard</h1>
+      <h1>{t('landlordDashboard')}</h1>
       {error && <p className="error">{error}</p>}
       <div className="tabs">
-        {TABS.map((t) => (
-          <button key={t} className={tab === t ? 'tab active' : 'tab'} onClick={() => setTab(t)}>{t}</button>
+        {TABS.map((tb) => (
+          <button key={tb} className={tab === tb ? 'tab active' : 'tab'} onClick={() => setTab(tb)}>{t(TAB_LABELS[tb])}</button>
         ))}
       </div>
 
-      {tab === 'Overview' && summary && (
+      {tab === 'overview' && summary && (
         <div className="grid">
-          <div className="card"><h3>Rent received</h3><p className="big">{formatPKR(summary.received)}</p></div>
-          <div className="card"><h3>Rent pending</h3><p className="big">{formatPKR(summary.pending)}</p></div>
-          <div className="card"><h3>Total income</h3><p className="big">{formatPKR(summary.total_income)}</p></div>
-          <div className="card"><h3>Properties</h3><p className="big">{properties.length}</p></div>
-          <div className="card"><h3>Active tenancies</h3><p className="big">{tenancies.filter((t) => t.status === 'active').length}</p></div>
-          <div className="card"><h3>Open complaints</h3><p className="big">{complaints.filter((c) => c.status !== 'resolved').length}</p></div>
+          <div className="card"><h3>{t('rentReceived')}</h3><p className="big">{formatPKR(summary.received)}</p></div>
+          <div className="card"><h3>{t('rentPending')}</h3><p className="big">{formatPKR(summary.pending)}</p></div>
+          <div className="card"><h3>{t('totalIncome')}</h3><p className="big">{formatPKR(summary.total_income)}</p></div>
+          <div className="card"><h3>{t('properties')}</h3><p className="big">{properties.length}</p></div>
+          <div className="card"><h3>{t('activeTenancies')}</h3><p className="big">{tenancies.filter((tn) => tn.status === 'active').length}</p></div>
+          <div className="card"><h3>{t('openComplaints')}</h3><p className="big">{complaints.filter((c) => c.status !== 'resolved').length}</p></div>
         </div>
       )}
 
-      {tab === 'Properties' && (
+      {tab === 'properties' && (
         <div>
           <form onSubmit={addProperty} className="form card">
-            <h3>Add property</h3>
+            <h3>{t('addProperty')}</h3>
             <div className="row">
-              <label>Title<input value={propForm.title} onChange={(e) => setPropForm({ ...propForm, title: e.target.value })} required /></label>
-              <label>Monthly rent<input type="number" value={propForm.monthly_rent} onChange={(e) => setPropForm({ ...propForm, monthly_rent: e.target.value })} required /></label>
+              <label>{t('title')}<input value={propForm.title} onChange={(e) => setPropForm({ ...propForm, title: e.target.value })} required /></label>
+              <label>{t('monthlyRent')}<input type="number" value={propForm.monthly_rent} onChange={(e) => setPropForm({ ...propForm, monthly_rent: e.target.value })} required /></label>
             </div>
-            <label>Address<input value={propForm.address} onChange={(e) => setPropForm({ ...propForm, address: e.target.value })} required /></label>
+            <label>{t('address')}<input value={propForm.address} onChange={(e) => setPropForm({ ...propForm, address: e.target.value })} required /></label>
             <div className="row">
-              <label>Area<input value={propForm.area} onChange={(e) => setPropForm({ ...propForm, area: e.target.value })} /></label>
-              <label>City<input value={propForm.city} onChange={(e) => setPropForm({ ...propForm, city: e.target.value })} /></label>
-              <label>Type
+              <label>{t('area')}<input value={propForm.area} onChange={(e) => setPropForm({ ...propForm, area: e.target.value })} /></label>
+              <label>{t('city')}<input value={propForm.city} onChange={(e) => setPropForm({ ...propForm, city: e.target.value })} /></label>
+              <label>{t('type')}
                 <select value={propForm.property_type} onChange={(e) => setPropForm({ ...propForm, property_type: e.target.value })}>
-                  <option value="house">House</option>
-                  <option value="flat">Flat</option>
-                  <option value="shop">Shop</option>
-                  <option value="plot">Plot</option>
+                  <option value="house">{t('house')}</option>
+                  <option value="flat">{t('flat')}</option>
+                  <option value="shop">{t('shop')}</option>
+                  <option value="plot">{t('plot')}</option>
                 </select>
               </label>
             </div>
-            <button className="btn btn-primary" type="submit">Add property</button>
+            <button className="btn btn-primary" type="submit">{t('addProperty')}</button>
           </form>
           <table className="table">
-            <thead><tr><th>Title</th><th>Area</th><th>Rent</th><th>Occupied</th></tr></thead>
+            <thead><tr><th>{t('title')}</th><th>{t('area')}</th><th>{t('rent')}</th><th>{t('occupied')}</th></tr></thead>
             <tbody>
               {properties.map((p) => (
                 <tr key={p.id}>
                   <td>{p.title}</td><td>{p.area}, {p.city}</td>
-                  <td>{formatPKR(p.monthly_rent)}</td><td>{p.is_occupied ? 'Yes' : 'No'}</td>
+                  <td>{formatPKR(p.monthly_rent)}</td><td>{p.is_occupied ? t('yes') : t('no')}</td>
                 </tr>
               ))}
             </tbody>
@@ -146,34 +156,34 @@ export default function LandlordDashboard() {
         </div>
       )}
 
-      {tab === 'Tenants' && (
+      {tab === 'tenants' && (
         <div>
           <form onSubmit={addTenancy} className="form card">
-            <h3>Add tenancy (tenant must already have a tenant account)</h3>
+            <h3>{t('addTenancyHint')}</h3>
             <div className="row">
-              <label>Property
+              <label>{t('property')}
                 <select value={tenancyForm.property_id} onChange={(e) => setTenancyForm({ ...tenancyForm, property_id: e.target.value })} required>
-                  <option value="">Select…</option>
+                  <option value="">{t('select')}</option>
                   {properties.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
                 </select>
               </label>
-              <label>Tenant email<input value={tenancyForm.tenant_email} onChange={(e) => setTenancyForm({ ...tenancyForm, tenant_email: e.target.value })} required /></label>
+              <label>{t('tenantEmail')}<input value={tenancyForm.tenant_email} onChange={(e) => setTenancyForm({ ...tenancyForm, tenant_email: e.target.value })} required /></label>
             </div>
             <div className="row">
-              <label>Monthly rent<input type="number" value={tenancyForm.monthly_rent} onChange={(e) => setTenancyForm({ ...tenancyForm, monthly_rent: e.target.value })} required /></label>
-              <label>Due day<input type="number" min="1" max="31" value={tenancyForm.due_day} onChange={(e) => setTenancyForm({ ...tenancyForm, due_day: e.target.value })} required /></label>
-              <label>Start date<input type="date" value={tenancyForm.start_date} onChange={(e) => setTenancyForm({ ...tenancyForm, start_date: e.target.value })} required /></label>
+              <label>{t('monthlyRent')}<input type="number" value={tenancyForm.monthly_rent} onChange={(e) => setTenancyForm({ ...tenancyForm, monthly_rent: e.target.value })} required /></label>
+              <label>{t('dueDay')}<input type="number" min="1" max="31" value={tenancyForm.due_day} onChange={(e) => setTenancyForm({ ...tenancyForm, due_day: e.target.value })} required /></label>
+              <label>{t('startDate')}<input type="date" value={tenancyForm.start_date} onChange={(e) => setTenancyForm({ ...tenancyForm, start_date: e.target.value })} required /></label>
             </div>
-            <button className="btn btn-primary" type="submit">Add tenancy</button>
+            <button className="btn btn-primary" type="submit">{t('addTenancy')}</button>
           </form>
           <table className="table">
-            <thead><tr><th>Property</th><th>Tenant</th><th>Rent</th><th>Due day</th><th>Status</th></tr></thead>
+            <thead><tr><th>{t('property')}</th><th>{t('tenant')}</th><th>{t('rent')}</th><th>{t('dueDay')}</th><th>{t('status')}</th></tr></thead>
             <tbody>
-              {tenancies.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.property_title}</td><td>{t.tenant_name}</td>
-                  <td>{formatPKR(t.monthly_rent)}</td><td>{t.due_day}</td>
-                  <td><StatusBadge status={t.status} /></td>
+              {tenancies.map((tn) => (
+                <tr key={tn.id}>
+                  <td>{tn.property_title}</td><td>{tn.tenant_name}</td>
+                  <td>{formatPKR(tn.monthly_rent)}</td><td>{tn.due_day}</td>
+                  <td><StatusBadge status={tn.status} /></td>
                 </tr>
               ))}
             </tbody>
@@ -181,9 +191,9 @@ export default function LandlordDashboard() {
         </div>
       )}
 
-      {tab === 'Complaints' && (
+      {tab === 'complaints' && (
         <table className="table">
-          <thead><tr><th>Property</th><th>Tenant</th><th>Title</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>{t('property')}</th><th>{t('tenant')}</th><th>{t('title')}</th><th>{t('status')}</th><th>{t('action')}</th></tr></thead>
           <tbody>
             {complaints.map((c) => (
               <tr key={c.id}>
@@ -197,9 +207,9 @@ export default function LandlordDashboard() {
                       load();
                     }}
                   >
-                    <option value="open">Open</option>
-                    <option value="in_progress">In progress</option>
-                    <option value="resolved">Resolved</option>
+                    <option value="open">{t('stOpen')}</option>
+                    <option value="in_progress">{t('stInProgress')}</option>
+                    <option value="resolved">{t('stResolved')}</option>
                   </select>
                 </td>
               </tr>
@@ -208,41 +218,41 @@ export default function LandlordDashboard() {
         </table>
       )}
 
-      {tab === 'Dealers' && (
+      {tab === 'dealers' && (
         <div>
           <form onSubmit={inviteDealer} className="form card">
-            <h3>Invite a dealer</h3>
+            <h3>{t('inviteDealer')}</h3>
             <div className="row">
-              <label>Dealer email<input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} required /></label>
-              <label>Property (optional — blank means all your properties)
+              <label>{t('dealerEmail')}<input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} required /></label>
+              <label>{t('propertyOptional')}
                 <select value={invitePropertyId} onChange={(e) => setInvitePropertyId(e.target.value)}>
-                  <option value="">All properties</option>
+                  <option value="">{t('allProperties')}</option>
                   {properties.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
                 </select>
               </label>
             </div>
-            <button className="btn btn-primary" type="submit">Send invite</button>
+            <button className="btn btn-primary" type="submit">{t('sendInvite')}</button>
           </form>
           <table className="table">
-            <thead><tr><th>Dealer</th><th>Business</th><th>Property</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>{t('dealer')}</th><th>{t('business')}</th><th>{t('property')}</th><th>{t('status')}</th><th>{t('actions')}</th></tr></thead>
             <tbody>
               {links.map((l) => (
                 <tr key={l.id}>
                   <td>{l.dealer_name}</td><td>{l.dealer_business_name || '—'}</td>
-                  <td>{l.property_title || 'All properties'}</td>
+                  <td>{l.property_title || t('allProperties')}</td>
                   <td><StatusBadge status={l.status} /></td>
                   <td>
                     {l.status === 'pending' && l.initiated_by === 'dealer' && (
                       <>
-                        <button className="btn btn-small" onClick={() => linkAction(l.id, 'approve')}>Approve</button>{' '}
-                        <button className="btn btn-small btn-ghost" onClick={() => linkAction(l.id, 'reject')}>Reject</button>
+                        <button className="btn btn-small" onClick={() => linkAction(l.id, 'approve')}>{t('approve')}</button>{' '}
+                        <button className="btn btn-small btn-ghost" onClick={() => linkAction(l.id, 'reject')}>{t('reject')}</button>
                       </>
                     )}
                     {l.status === 'active' && (
-                      <button className="btn btn-small btn-danger" onClick={() => linkAction(l.id, 'revoke')}>Revoke</button>
+                      <button className="btn btn-small btn-danger" onClick={() => linkAction(l.id, 'revoke')}>{t('revoke')}</button>
                     )}
                     {l.status === 'pending' && l.initiated_by === 'landlord' && (
-                      <span className="muted">Awaiting dealer</span>
+                      <span className="muted">{t('awaitingDealer')}</span>
                     )}
                   </td>
                 </tr>
@@ -252,9 +262,9 @@ export default function LandlordDashboard() {
         </div>
       )}
 
-      {tab === 'Commissions' && (
+      {tab === 'commissions' && (
         <table className="table">
-          <thead><tr><th>Dealer</th><th>Property</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th>{t('dealer')}</th><th>{t('property')}</th><th>{t('amount')}</th><th>{t('status')}</th><th>{t('action')}</th></tr></thead>
           <tbody>
             {commissions.map((c) => (
               <tr key={c.id}>
@@ -269,7 +279,7 @@ export default function LandlordDashboard() {
                         load();
                       }}
                     >
-                      Mark as paid
+                      {t('markAsPaid')}
                     </button>
                   )}
                 </td>

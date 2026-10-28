@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
+import { useLanguage } from '../i18n';
 
 const EMPTY = { property_id: '', prospective_tenant_name: '', contact_number: '', notes: '', status: 'new', viewing_date: '' };
 
 export default function Inquiries() {
+  const { t } = useLanguage();
   const [inquiries, setInquiries] = useState([]);
   const [properties, setProperties] = useState([]);
   const [form, setForm] = useState(EMPTY);
@@ -43,7 +45,7 @@ export default function Inquiries() {
         },
       });
       setForm(EMPTY);
-      setNotice('Inquiry logged successfully.');
+      setNotice(t('inquirySuccess'));
       load();
     } catch (err) {
       setError(err.message);
@@ -54,42 +56,42 @@ export default function Inquiries() {
 
   return (
     <div>
-      <h1>Inquiries</h1>
-      <p className="muted">Log an inquiry right after a call — only name, contact, property and notes are required.</p>
+      <h1>{t('inquiries')}</h1>
+      <p className="muted">{t('inquiriesHint')}</p>
       {error && <p className="error">{error}</p>}
       {notice && <p className="success">{notice}</p>}
       {properties.length === 0 && (
-        <p className="muted">No properties available yet — link a landlord first from My Landlords, then their properties will appear in the dropdown.</p>
+        <p className="muted">{t('noPropertiesHint')}</p>
       )}
       <form onSubmit={submit} className="form card">
         <div className="row">
-          <label>Name<input value={form.prospective_tenant_name} onChange={(e) => setForm({ ...form, prospective_tenant_name: e.target.value })} required /></label>
-          <label>Contact number<input value={form.contact_number} onChange={(e) => setForm({ ...form, contact_number: e.target.value })} required /></label>
+          <label>{t('name')}<input value={form.prospective_tenant_name} onChange={(e) => setForm({ ...form, prospective_tenant_name: e.target.value })} required /></label>
+          <label>{t('contactNumber')}<input value={form.contact_number} onChange={(e) => setForm({ ...form, contact_number: e.target.value })} required /></label>
         </div>
         <div className="row">
-          <label>Property
+          <label>{t('property')}
             <select value={form.property_id} onChange={(e) => setForm({ ...form, property_id: e.target.value })} required>
-              <option value="">Select…</option>
+              <option value="">{t('select')}</option>
               {properties.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
             </select>
           </label>
-          <label>Status (optional)
+          <label>{t('statusOptional')}
             <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="new">New</option>
-              <option value="viewing_scheduled">Viewing scheduled</option>
-              <option value="closed">Closed</option>
-              <option value="lost">Lost</option>
+              <option value="new">{t('stNew')}</option>
+              <option value="viewing_scheduled">{t('stViewing')}</option>
+              <option value="closed">{t('stClosed')}</option>
+              <option value="lost">{t('stLost')}</option>
             </select>
           </label>
-          <label>Viewing date (optional)<input type="datetime-local" value={form.viewing_date} onChange={(e) => setForm({ ...form, viewing_date: e.target.value })} /></label>
+          <label>{t('viewingDateOptional')}<input type="datetime-local" value={form.viewing_date} onChange={(e) => setForm({ ...form, viewing_date: e.target.value })} /></label>
         </div>
-        <label>Notes<textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} required /></label>
+        <label>{t('notes')}<textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} required /></label>
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? 'Logging...' : 'Log inquiry'}
+          {submitting ? t('logging') : t('logInquiry')}
         </button>
       </form>
       <table className="table">
-        <thead><tr><th>Name</th><th>Contact</th><th>Property</th><th>Status</th><th>Viewing</th><th>Notes</th></tr></thead>
+        <thead><tr><th>{t('name')}</th><th>{t('contact')}</th><th>{t('property')}</th><th>{t('status')}</th><th>{t('viewing')}</th><th>{t('notes')}</th></tr></thead>
         <tbody>
           {inquiries.map((i) => (
             <tr key={i.id}>
@@ -102,10 +104,10 @@ export default function Inquiries() {
                     load();
                   }}
                 >
-                  <option value="new">New</option>
-                  <option value="viewing_scheduled">Viewing scheduled</option>
-                  <option value="closed">Closed</option>
-                  <option value="lost">Lost</option>
+                  <option value="new">{t('stNew')}</option>
+                  <option value="viewing_scheduled">{t('stViewing')}</option>
+                  <option value="closed">{t('stClosed')}</option>
+                  <option value="lost">{t('stLost')}</option>
                 </select>
               </td>
               <td>{i.viewing_date ? new Date(i.viewing_date).toLocaleString() : '—'}</td>

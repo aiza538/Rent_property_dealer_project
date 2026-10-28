@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import { formatPKR } from '../constants';
+import { useLanguage } from '../i18n';
 
 export default function DealerDashboard() {
+  const { t } = useLanguage();
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState('');
 
@@ -13,24 +15,24 @@ export default function DealerDashboard() {
   }, []);
 
   if (error) return <p className="error">{error}</p>;
-  if (!summary) return <p className="muted">Loading…</p>;
+  if (!summary) return <p className="muted">{t('loading')}</p>;
 
   return (
     <div>
-      <h1>Dealer Dashboard</h1>
+      <h1>{t('dealerDashboard')}</h1>
       <div className="grid">
-        <div className="card"><h3>Linked landlords</h3><p className="big">{summary.total_linked_landlords}</p></div>
-        <div className="card"><h3>Properties</h3><p className="big">{summary.total_properties}</p></div>
-        <div className="card"><h3>Vacant units</h3><p className="big">{summary.vacant_count}</p></div>
-        <div className="card"><h3>Open inquiries</h3><p className="big">{summary.open_inquiries_count}</p></div>
-        <div className="card"><h3>Pending commission</h3><p className="big">{formatPKR(summary.pending_commission_total)}</p></div>
+        <div className="card"><h3>{t('linkedLandlords')}</h3><p className="big">{summary.total_linked_landlords}</p></div>
+        <div className="card"><h3>{t('properties')}</h3><p className="big">{summary.total_properties}</p></div>
+        <div className="card"><h3>{t('vacantUnits')}</h3><p className="big">{summary.vacant_count}</p></div>
+        <div className="card"><h3>{t('openInquiries')}</h3><p className="big">{summary.open_inquiries_count}</p></div>
+        <div className="card"><h3>{t('pendingCommission')}</h3><p className="big">{formatPKR(summary.pending_commission_total)}</p></div>
       </div>
 
-      <h2>Recent activity</h2>
+      <h2>{t('recentActivity')}</h2>
       <div className="grid">
         <div className="card">
-          <h3>Recent inquiries</h3>
-          {summary.recent_inquiries.length === 0 && <p className="muted">None yet.</p>}
+          <h3>{t('recentInquiries')}</h3>
+          {summary.recent_inquiries.length === 0 && <p className="muted">{t('noneYet')}</p>}
           <ul className="list">
             {summary.recent_inquiries.map((i) => (
               <li key={i.id}>
@@ -38,19 +40,19 @@ export default function DealerDashboard() {
               </li>
             ))}
           </ul>
-          <Link to="/dealer/inquiries">View all inquiries →</Link>
+          <Link to="/dealer/inquiries">{t('viewAllInquiries')}</Link>
         </div>
         <div className="card">
-          <h3>Recent listings</h3>
-          {summary.recent_listings.length === 0 && <p className="muted">None yet.</p>}
+          <h3>{t('recentListings')}</h3>
+          {summary.recent_listings.length === 0 && <p className="muted">{t('noneYet')}</p>}
           <ul className="list">
             {summary.recent_listings.map((l) => (
               <li key={l.id}>
-                {l.property_title} — {l.is_vacant ? 'Vacant' : 'Occupied'}
+                {l.property_title} — {l.is_vacant ? t('vacant') : t('occupied')}
               </li>
             ))}
           </ul>
-          <Link to="/dealer/properties">View properties →</Link>
+          <Link to="/dealer/properties">{t('viewProperties')}</Link>
         </div>
       </div>
     </div>

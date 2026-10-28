@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { LANGUAGES, useLanguage } from '../i18n';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
+  const { lang, dir, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   function onLogout() {
@@ -17,28 +19,47 @@ export default function Layout({ children }) {
         <nav className="nav">
           {user?.role === 'landlord' && (
             <>
-              <Link to="/landlord">Dashboard</Link>
-              <Link to="/commissions">Commissions</Link>
+              <Link to="/landlord">{t('dashboard')}</Link>
+              <Link to="/commissions">{t('commissions')}</Link>
             </>
           )}
-          {user?.role === 'tenant' && <Link to="/tenant">Dashboard</Link>}
+          {user?.role === 'tenant' && <Link to="/tenant">{t('dashboard')}</Link>}
           {user?.role === 'dealer' && (
             <>
-              <Link to="/dealer">Dashboard</Link>
-              <Link to="/dealer/landlords">My Landlords</Link>
-              <Link to="/dealer/properties">Properties</Link>
-              <Link to="/dealer/inquiries">Inquiries</Link>
-              <Link to="/dealer/agreements">Agreements</Link>
-              <Link to="/dealer/commissions">Commissions</Link>
+              <Link to="/dealer">{t('dashboard')}</Link>
+              <Link to="/dealer/landlords">{t('myLandlords')}</Link>
+              <Link to="/dealer/properties">{t('properties')}</Link>
+              <Link to="/dealer/inquiries">{t('inquiries')}</Link>
+              <Link to="/dealer/agreements">{t('agreements')}</Link>
+              <Link to="/dealer/commissions">{t('commissions')}</Link>
             </>
           )}
         </nav>
         <div className="topbar-right">
+          <div className="lang-switch" role="group" aria-label="Language">
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                className={lang === l.code ? 'active' : ''}
+                onClick={() => setLang(l.code)}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
           {user && <span className="muted">{user.name} ({user.role})</span>}
-          {user && <button className="btn btn-ghost" onClick={onLogout}>Logout</button>}
+          {user && <button className="btn btn-ghost" onClick={onLogout}>{t('logout')}</button>}
         </div>
       </header>
-      <main className="container">{children}</main>
+      <main className="container">
+        {user && (
+          <button className="btn btn-ghost back-btn" type="button" onClick={() => navigate(-1)}>
+            {dir === 'rtl' ? '→' : '←'} {t('back')}
+          </button>
+        )}
+        {children}
+      </main>
     </div>
   );
 }
