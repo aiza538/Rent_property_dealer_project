@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
-import { formatPKR } from '../constants';
+import { formatAFN } from '../constants';
 import { useLanguage } from '../i18n';
 
 export default function TenantDashboard() {
@@ -59,7 +59,7 @@ export default function TenantDashboard() {
       {tenancy ? (
         <div className="card">
           <h3>{tenancy.property_title}</h3>
-          <p>{t('monthlyRentIs')} {formatPKR(tenancy.monthly_rent)} · {t('dueDayIs')} {tenancy.due_day} · {t('statusIs')} <StatusBadge status={tenancy.status} /></p>
+          <p>{t('monthlyRentIs')} {formatAFN(tenancy.monthly_rent)} · {t('dueDayIs')} {tenancy.due_day} · {t('statusIs')} <StatusBadge status={tenancy.status} /></p>
         </div>
       ) : (
         <p className="muted">{t('noTenancy')}</p>
@@ -71,7 +71,7 @@ export default function TenantDashboard() {
         <tbody>
           {payments.map((p) => (
             <tr key={p.id}>
-              <td>{formatPKR(p.amount)}</td><td>{p.due_date}</td><td>{p.paid_date || '—'}</td>
+              <td>{formatAFN(p.amount)}</td><td>{p.due_date}</td><td>{p.paid_date || '—'}</td>
               <td><StatusBadge status={p.status} /></td>
             </tr>
           ))}

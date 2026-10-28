@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
-import { formatPKR } from '../constants';
+import { formatAFN } from '../constants';
 import { useLanguage } from '../i18n';
 
 const TABS = ['overview', 'properties', 'tenants', 'complaints', 'dealers', 'commissions'];
@@ -110,9 +110,9 @@ export default function LandlordDashboard() {
 
       {tab === 'overview' && summary && (
         <div className="grid">
-          <div className="card"><h3>{t('rentReceived')}</h3><p className="big">{formatPKR(summary.received)}</p></div>
-          <div className="card"><h3>{t('rentPending')}</h3><p className="big">{formatPKR(summary.pending)}</p></div>
-          <div className="card"><h3>{t('totalIncome')}</h3><p className="big">{formatPKR(summary.total_income)}</p></div>
+          <div className="card"><h3>{t('rentReceived')}</h3><p className="big">{formatAFN(summary.received)}</p></div>
+          <div className="card"><h3>{t('rentPending')}</h3><p className="big">{formatAFN(summary.pending)}</p></div>
+          <div className="card"><h3>{t('totalIncome')}</h3><p className="big">{formatAFN(summary.total_income)}</p></div>
           <div className="card"><h3>{t('properties')}</h3><p className="big">{properties.length}</p></div>
           <div className="card"><h3>{t('activeTenancies')}</h3><p className="big">{tenancies.filter((tn) => tn.status === 'active').length}</p></div>
           <div className="card"><h3>{t('openComplaints')}</h3><p className="big">{complaints.filter((c) => c.status !== 'resolved').length}</p></div>
@@ -148,7 +148,7 @@ export default function LandlordDashboard() {
               {properties.map((p) => (
                 <tr key={p.id}>
                   <td>{p.title}</td><td>{p.area}, {p.city}</td>
-                  <td>{formatPKR(p.monthly_rent)}</td><td>{p.is_occupied ? t('yes') : t('no')}</td>
+                  <td>{formatAFN(p.monthly_rent)}</td><td>{p.is_occupied ? t('yes') : t('no')}</td>
                 </tr>
               ))}
             </tbody>
@@ -182,7 +182,7 @@ export default function LandlordDashboard() {
               {tenancies.map((tn) => (
                 <tr key={tn.id}>
                   <td>{tn.property_title}</td><td>{tn.tenant_name}</td>
-                  <td>{formatPKR(tn.monthly_rent)}</td><td>{tn.due_day}</td>
+                  <td>{formatAFN(tn.monthly_rent)}</td><td>{tn.due_day}</td>
                   <td><StatusBadge status={tn.status} /></td>
                 </tr>
               ))}
@@ -269,7 +269,7 @@ export default function LandlordDashboard() {
             {commissions.map((c) => (
               <tr key={c.id}>
                 <td>{c.dealer_name}</td><td>{c.property_title}</td>
-                <td>{formatPKR(c.amount)}</td><td><StatusBadge status={c.status} /></td>
+                <td>{formatAFN(c.amount)}</td><td><StatusBadge status={c.status} /></td>
                 <td>
                   {c.status === 'pending' && (
                     <button

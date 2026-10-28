@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import { useAuth } from '../AuthContext';
-import { formatPKR } from '../constants';
+import { formatAFN } from '../constants';
 import { useLanguage } from '../i18n';
 
 export default function Commissions() {
@@ -71,7 +71,7 @@ export default function Commissions() {
         <tbody>
           {rows.map((c) => (
             <tr key={c.id}>
-              <td>{c.property_title}</td><td>{formatPKR(c.amount)}</td>
+              <td>{c.property_title}</td><td>{formatAFN(c.amount)}</td>
               <td><StatusBadge status={c.status} /></td>
               <td>{c.deal_closed_date || '—'}</td>
               <td>

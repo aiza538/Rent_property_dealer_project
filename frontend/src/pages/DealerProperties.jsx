@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
-import { formatPKR } from '../constants';
+import { formatAFN } from '../constants';
 import { useLanguage } from '../i18n';
 
 export default function DealerProperties() {
@@ -57,7 +57,7 @@ export default function DealerProperties() {
           {filtered.map((p) => (
             <tr key={p.id}>
               <td>{p.title}</td><td>{landlordNames[p.landlord_id] || '—'}</td>
-              <td>{p.area}, {p.city}</td><td>{formatPKR(p.monthly_rent)}</td>
+              <td>{p.area}, {p.city}</td><td>{formatAFN(p.monthly_rent)}</td>
               <td>{p.is_occupied ? t('occupied') : t('vacant')}</td>
             </tr>
           ))}

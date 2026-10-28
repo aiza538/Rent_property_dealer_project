@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
-import { formatPKR } from '../constants';
+import { formatAFN } from '../constants';
 import { useLanguage } from '../i18n';
 
 export default function DealerDashboard() {
@@ -25,7 +25,7 @@ export default function DealerDashboard() {
         <div className="card"><h3>{t('properties')}</h3><p className="big">{summary.total_properties}</p></div>
         <div className="card"><h3>{t('vacantUnits')}</h3><p className="big">{summary.vacant_count}</p></div>
         <div className="card"><h3>{t('openInquiries')}</h3><p className="big">{summary.open_inquiries_count}</p></div>
-        <div className="card"><h3>{t('pendingCommission')}</h3><p className="big">{formatPKR(summary.pending_commission_total)}</p></div>
+        <div className="card"><h3>{t('pendingCommission')}</h3><p className="big">{formatAFN(summary.pending_commission_total)}</p></div>
       </div>
 
       <h2>{t('recentActivity')}</h2>
