@@ -4,7 +4,7 @@ import { LANGUAGES, useLanguage } from '../i18n';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const { lang, dir, setLang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   function onLogout() {
@@ -48,16 +48,11 @@ export default function Layout({ children }) {
               </button>
             ))}
           </div>
-          {user && <span className="muted">{user.name} ({user.role})</span>}
+          {user && <span className="muted topbar-user">{user.name} ({user.role})</span>}
           {user && <button className="btn btn-ghost" onClick={onLogout}>{t('logout')}</button>}
         </div>
       </header>
       <main className="container">
-        {user && (
-          <button className="btn btn-ghost back-btn" type="button" onClick={() => navigate(-1)}>
-            {dir === 'rtl' ? '→' : '←'} {t('back')}
-          </button>
-        )}
         {children}
       </main>
     </div>
